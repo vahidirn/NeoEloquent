@@ -275,7 +275,13 @@ class CypherGrammar extends Grammar {
         }
 
         $values = $this->parameterize($where['values']);
-        $values = str_replace(['{','}'], "'", $values);
+
+        if(substr( $where['column'], 0, 3 )==="id("){
+            $values = str_replace(['{','}'], "", $values);
+        }else{
+            $values = str_replace(['{','}'], "'", $values);
+        }
+
         return 'not '. $this->wrap($where['column']).' in ['.$values.']';
     }
 
@@ -456,9 +462,16 @@ class CypherGrammar extends Grammar {
      */
     protected function whereIn(Builder $query, $where)
     {
-        $values = $this->valufy($where['values']);
 
-        return $this->wrap($where['column']).' IN ['.$values.']';
+        $values = $this->parameterize($where['values']);
+
+        if(substr( $where['column'], 0, 3 )==="id("){
+            $values = str_replace(['{','}'], "", $values);
+        }else{
+            $values = str_replace(['{','}'], "'", $values);
+        }
+
+        return $this->wrap($where['column']).' in ['.$values.']';
     }
 
     /**
